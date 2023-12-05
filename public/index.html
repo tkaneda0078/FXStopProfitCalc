@@ -16,7 +16,14 @@
                 </select>
             </div>
             <div class="col-md-4 mb-3">
-                <input type="number" id="entryPrice" class="form-control" placeholder="エントリー価格">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="number" id="entryPrice" class="form-control" placeholder="エントリー価格">
+                        <div class="input-group-append">
+                            <button onclick="fetchCurrentExchangeRate()" class="btn btn-outline-secondary" type="button">現在のレートを取得</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-md-4 mb-3">
                 <select id="interval" class="form-control">

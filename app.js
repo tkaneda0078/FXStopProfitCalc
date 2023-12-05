@@ -6,6 +6,7 @@ dotenv.config();
 
 const app = express();
 const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+const baseUrl = 'https://www.alphavantage.co/query';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 app.use(express.json());
@@ -28,14 +29,23 @@ app.post('/calculate', async (req, res) => {
     res.json({ stopLoss, takeProfit, atrValue, atrPeriod: '14' });
 });
 
+app.post('/current-exchange-rate', async (req, res) => {
+    const { fromCurrency, toCurrency } = req.body;
+    const url = `${baseUrl}?function=CURRENCY_EXCHANGE_RATE&from_currency=${fromCurrency}&to_currency=${toCurrency}&apikey=${apiKey}`;
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const exchangeRate = extractExchangeRate(data);
+        res.json({ exchangeRate });
+    } catch (error) {
+        console.error('Error fetching exchange rate:', error);
+        res.status(500).send('Unable to fetch exchange rate');
+    }
 });
 
 async function getATRValue(symbol, interval) {
-    const url = `https://www.alphavantage.co/query?function=ATR&symbol=${symbol}&interval=${interval}&time_period=14&apikey=${apiKey}`;
+    const url = `${baseUrl}?function=ATR&symbol=${symbol}&interval=${interval}&time_period=14&apikey=${apiKey}`;
 
     try {
         const response = await fetch(url);
@@ -59,3 +69,26 @@ function extractATRValue(data) {
         return 0;
     }
 }
+
+/**
+ * Alpha Vantage APIのレスポンスデータから為替レートを抽出する
+ * 価格を小数点以下第3位までの数値にフォーマットする
+ *
+ * @param {object} data - Alpha Vantage APIからのレスポンスデータ
+ * @returns {string|null} 抽出された為替レート。データが存在しない場合はnullを返す
+ */
+function extractExchangeRate(data) {
+    if (data && data["Realtime Currency Exchange Rate"]) {
+        const exchangeRateData = data["Realtime Currency Exchange Rate"];
+        const exchangeRate = exchangeRateData["5. Exchange Rate"];
+        return parseFloat(parseFloat(exchangeRate).toFixed(3));
+    } else {
+        console.error('Exchange rate data not found in response');
+        return null;
+    }
+}
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
