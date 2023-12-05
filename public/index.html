@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATR Line Calculator</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ATR Line Calculator</h1>
+        <select id="positionType">
+            <option value="buy">買い</option>
+            <option value="sell">売り</option>
+        </select>
+        <input type="number" id="entryPrice" placeholder="エントリー価格">
+        <select id="interval">
+            <option value="1min">1分</option>
+            <option value="5min">5分</option>
+            <option value="15min">15分</option>
+            <option value="30min">30分</option>
+            <option value="60min" selected>60分</option>
+        </select>
+        <input type="number" id="atrMultiplier" placeholder="ATR倍率" step="0.5">
+        <input type="datetime-local" id="entryTime" placeholder="エントリー時間">
+
+        <button onclick="calculate()">算出</button>
+        <div id="output"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
