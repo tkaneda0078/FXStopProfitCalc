@@ -1,13 +1,16 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import path from 'path';
 import fetch from 'node-fetch';
 dotenv.config();
 
 const app = express();
 const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 
 app.post('/calculate', async (req, res) => {
     const { entryPrice, interval, atrMultiplier, positionType } = req.body;
